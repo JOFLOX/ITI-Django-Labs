@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ product.name }} - MarketPlace{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'products:list' %}" class="text-decoration-none">
+                        <i class="fas fa-home"></i> Products
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'products:detail' product.pk %}" class="text-decoration-none">
+                        {{ product.name }}
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Delete</li>
+            </ol>
+        </nav>
+        
+        <!-- Warning Card -->
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h2 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Confirm Deletion
+                </h2>
+            </div>
+            
+            <div class="card-body">
+                <div class="alert alert-danger" role="alert">
+                    <h5 class="alert-heading">
+                        <i class="fas fa-warning"></i> Warning!
+                    </h5>
+                    <p class="mb-0">
+                        You are about to permanently delete this product. This action cannot be undone.
+                    </p>
+                </div>
+                
+                <!-- Product Preview -->
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="img-fluid rounded" 
+                                 style="max-height: 200px; object-fit: cover;" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="d-flex align-items-center justify-content-center bg-light rounded" 
+                                 style="height: 200px;">
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <h3 class="text-danger">{{ product.name }}</h3>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <strong>Product Code:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                <span class="badge bg-secondary">{{ product.code }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <strong>Price:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                <span class="text-success">${{ product.price }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <strong>Stock:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {% if product.instock > 0 %}
+                                    <span class="badge bg-success">{{ product.instock }} in stock</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Out of stock</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <strong>Created:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{ product.created_at|date:"M d, Y H:i" }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <strong>Description:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                <p class="text-muted">{{ product.description|truncatewords:20 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Confirmation Form -->
+                <div class="mt-4 p-3 bg-light rounded">
+                    <h5><i class="fas fa-question-circle"></i> Are you sure you want to delete this product?</h5>
+                    <p class="text-muted mb-3">
+                        This will permanently remove "{{ product.name }}" from your marketplace. 
+                        All associated data will be lost.
+                    </p>
+                    
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'products:detail' product.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                            <a href="{% url 'products:list' %}" class="btn btn-info">
+                                <i class="fas fa-list"></i> Back to Products
+                            </a>
+                            <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">
+                                <i class="fas fa-trash"></i> Yes, Delete Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> What happens when you delete this product?
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-danger">
+                            <i class="fas fa-times-circle"></i> Will be removed:
+                        </h6>
+                        <ul class="text-muted">
+                            <li>Product information and description</li>
+                            <li>Product images and media files</li>
+                            <li>Stock and pricing data</li>
+                            <li>Creation and update timestamps</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-info">
+                            <i class="fas fa-lightbulb"></i> Alternative actions:
+                        </h6>
+                        <ul class="text-muted">
+                            <li>Set stock to 0 to mark as unavailable</li>
+                            <li>Update product information instead</li>
+                            <li>Archive the product for future reference</li>
+                            <li>Export product data before deletion</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete() {
+    return confirm('Are you absolutely sure you want to delete "{{ product.name }}"? This action cannot be undone!');
+}
+
+// Add some visual feedback
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButton = document.querySelector('button[type="submit"]');
+    if (deleteButton) {
+        deleteButton.addEventListener('mouseenter', function() {
+            this.innerHTML = '<i class="fas fa-skull-crossbones"></i> Permanently Delete';
+        });
+        
+        deleteButton.addEventListener('mouseleave', function() {
+            this.innerHTML = '<i class="fas fa-trash"></i> Yes, Delete Product';
+        });
+    }
+});
+</script>
+{% endblock %}

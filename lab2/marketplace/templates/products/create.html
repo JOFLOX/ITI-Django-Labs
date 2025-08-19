@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Product - MarketPlace{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'products:list' %}" class="text-decoration-none">
+                        <i class="fas fa-home"></i> Products
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Add New Product</li>
+            </ol>
+        </nav>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">
+                    <i class="fas fa-plus-circle"></i> Add New Product
+                </h2>
+                <p class="text-muted mb-0">Fill in the details below to add a new product to your marketplace</p>
+            </div>
+            
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="productForm">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <!-- Product Name -->
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">
+                                <i class="fas fa-tag"></i> Product Name *
+                            </label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   placeholder="Enter product name" required>
+                            <div class="form-text">Choose a descriptive name for your product</div>
+                        </div>
+                        
+                        <!-- Price -->
+                        <div class="col-md-6 mb-3">
+                            <label for="price" class="form-label">
+                                <i class="fas fa-dollar-sign"></i> Price *
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="price" name="price" 
+                                       step="0.01" min="0" placeholder="0.00" required>
+                            </div>
+                            <div class="form-text">Set the price for your product</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Stock Quantity -->
+                        <div class="col-md-6 mb-3">
+                            <label for="instock" class="form-label">
+                                <i class="fas fa-boxes"></i> Stock Quantity *
+                            </label>
+                            <input type="number" class="form-control" id="instock" name="instock" 
+                                   min="0" placeholder="0" required>
+                            <div class="form-text">Number of items available in stock</div>
+                        </div>
+                        
+                        <!-- Product Image -->
+                        <div class="col-md-6 mb-3">
+                            <label for="image" class="form-label">
+                                <i class="fas fa-image"></i> Product Image
+                            </label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                   accept="image/*" onchange="previewImage(this)">
+                            <div class="form-text">Upload an image for your product (optional)</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Image Preview -->
+                    <div class="mb-3" id="imagePreview" style="display: none;">
+                        <label class="form-label">Image Preview</label>
+                        <div class="border rounded p-2">
+                            <img id="preview" src="" alt="Preview" style="max-width: 200px; max-height: 200px;">
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-align-left"></i> Description *
+                        </label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  rows="4" placeholder="Enter product description" required></textarea>
+                        <div class="form-text">Provide a detailed description of your product</div>
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'products:list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Create Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-question-circle"></i> Need Help?
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-lightbulb"></i> Tips for Product Names</h6>
+                        <ul class="small text-muted">
+                            <li>Use clear, descriptive names</li>
+                            <li>Include brand name if applicable</li>
+                            <li>Avoid special characters</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-camera"></i> Image Guidelines</h6>
+                        <ul class="small text-muted">
+                            <li>Use high-quality images</li>
+                            <li>Recommended size: 800x600px</li>
+                            <li>Supported formats: JPG, PNG, GIF</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewImage(input) {
+    const preview = document.getElementById('preview');
+    const previewContainer = document.getElementById('imagePreview');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+}
+
+// Form validation
+document.getElementById('productForm').addEventListener('submit', function(e) {
+    const name = document.getElementById('name').value.trim();
+    const price = document.getElementById('price').value;
+    const instock = document.getElementById('instock').value;
+    const description = document.getElementById('description').value.trim();
+    
+    if (!name || !price || !instock || !description) {
+        e.preventDefault();
+        alert('Please fill in all required fields!');
+        return false;
+    }
+    
+    if (parseFloat(price) < 0) {
+        e.preventDefault();
+        alert('Price cannot be negative!');
+        return false;
+    }
+    
+    if (parseInt(instock) < 0) {
+        e.preventDefault();
+        alert('Stock quantity cannot be negative!');
+        return false;
+    }
+});
+</script>
+{% endblock %}

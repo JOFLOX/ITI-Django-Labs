@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ object.name }} - MarketPlace{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'category:list' %}" class="text-decoration-none">
+                        <i class="fas fa-tags"></i> Categories
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'category:detail' object.pk %}" class="text-decoration-none">
+                        {{ object.name }}
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+            </ol>
+        </nav>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">
+                    <i class="fas fa-edit"></i> Edit Category
+                </h2>
+                <p class="text-muted mb-0">Update the details for "{{ object.name }}"</p>
+            </div>
+            
+            <div class="card-body">
+                <!-- Current Image Display -->
+                {% if object.image %}
+                    <div class="mb-4">
+                        <label class="form-label">Current Image</label>
+                        <div class="border rounded p-2">
+                            <img src="{{ object.image.url }}" alt="{{ object.name }}" 
+                                 style="max-width: 200px; max-height: 200px;" class="rounded">
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data" id="categoryForm">
+                    {% csrf_token %}
+                    
+                    <!-- Display form errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Category Name -->
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label">
+                            <i class="fas fa-tag"></i> {{ form.name.label }} *
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.help_text %}
+                            <div class="form-text">{{ form.name.help_text }}</div>
+                        {% endif %}
+                        {% if form.name.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.name.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Category Description -->
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">
+                            <i class="fas fa-align-left"></i> {{ form.description.label }} *
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.help_text %}
+                            <div class="form-text">{{ form.description.help_text }}</div>
+                        {% endif %}
+                        {% if form.description.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.description.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Category Image -->
+                    <div class="mb-3">
+                        <label for="{{ form.image.id_for_label }}" class="form-label">
+                            <i class="fas fa-image"></i> {{ form.image.label }}
+                        </label>
+                        {{ form.image }}
+                        {% if form.image.help_text %}
+                            <div class="form-text">{{ form.image.help_text }}</div>
+                        {% endif %}
+                        {% if form.image.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.image.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> Leave empty to keep current image
+                        </div>
+                    </div>
+                    
+                    <!-- New Image Preview -->
+                    <div class="mb-3" id="imagePreview" style="display: none;">
+                        <label class="form-label">New Image Preview</label>
+                        <div class="border rounded p-2">
+                            <img id="preview" src="" alt="Preview" style="max-width: 200px; max-height: 200px;">
+                        </div>
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'category:detail' object.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <a href="{% url 'category:list' %}" class="btn btn-info">
+                            <i class="fas fa-list"></i> Back to Categories
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> Update Category
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Category Statistics -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar"></i> Category Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="border-end">
+                            <h4 class="text-primary">{{ object.get_products_count }}</h4>
+                            <small class="text-muted">Product{{ object.get_products_count|pluralize }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border-end">
+                            <h4 class="text-success">{{ object.created_at|date:"M d, Y" }}</h4>
+                            <small class="text-muted">Created</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border-end">
+                            <h4 class="text-info">{{ object.updated_at|date:"M d, Y" }}</h4>
+                            <small class="text-muted">Last Updated</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="text-warning">
+                            <i class="fas fa-edit"></i>
+                        </h4>
+                        <small class="text-muted">Editing</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Image preview functionality
+document.getElementById('{{ form.image.id_for_label }}').addEventListener('change', function(e) {
+    const preview = document.getElementById('preview');
+    const previewContainer = document.getElementById('imagePreview');
+    
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(e.target.files[0]);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+});
+
+// Form validation
+document.getElementById('categoryForm').addEventListener('submit', function(e) {
+    const name = document.getElementById('{{ form.name.id_for_label }}').value.trim();
+    const description = document.getElementById('{{ form.description.id_for_label }}').value.trim();
+    
+    if (!name || !description) {
+        e.preventDefault();
+        alert('Please fill in all required fields!');
+        return false;
+    }
+});
+</script>
+{% endblock %}

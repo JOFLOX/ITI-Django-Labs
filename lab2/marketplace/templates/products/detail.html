@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - MarketPlace{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'products:list' %}" class="text-decoration-none">
+                        <i class="fas fa-home"></i> Products
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+            </ol>
+        </nav>
+        
+        <div class="row">
+            <!-- Product Image -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="card-img-top" 
+                             style="height: 400px; object-fit: cover;" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="card-img-top d-flex align-items-center justify-content-center bg-light" 
+                             style="height: 400px;">
+                            <i class="fas fa-image fa-5x text-muted"></i>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Product Details -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h1 class="card-title mb-3">{{ product.name }}</h1>
+                        
+                        <!-- Product Code -->
+                        <div class="mb-3">
+                            <span class="badge bg-secondary fs-6">
+                                <i class="fas fa-barcode"></i> {{ product.code }}
+                            </span>
+                        </div>
+                        
+                        <!-- Price -->
+                        <div class="mb-4">
+                            <h2 class="text-success mb-0">
+                                <i class="fas fa-dollar-sign"></i> {{ product.price }}
+                            </h2>
+                        </div>
+                        
+                        <!-- Stock Status -->
+                        <div class="mb-4">
+                            {% if product.instock > 0 %}
+                                <div class="alert alert-success" role="alert">
+                                    <i class="fas fa-check-circle"></i> 
+                                    <strong>In Stock:</strong> {{ product.instock }} item{{ product.instock|pluralize }} available
+                                </div>
+                            {% else %}
+                                <div class="alert alert-danger" role="alert">
+                                    <i class="fas fa-exclamation-triangle"></i> 
+                                    <strong>Out of Stock</strong>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <h5><i class="fas fa-info-circle"></i> Description</h5>
+                            <p class="text-muted">{{ product.description|linebreaks }}</p>
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-plus"></i> Created<br>
+                                    <strong>{{ product.created_at|date:"M d, Y H:i" }}</strong>
+                                </small>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-edit"></i> Last Updated<br>
+                                    <strong>{{ product.updated_at|date:"M d, Y H:i" }}</strong>
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <a href="{% url 'products:list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Products
+                            </a>
+                            <a href="{% url 'products:delete' product.pk %}" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete Product
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Product Information -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar"></i> Product Statistics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h4 class="text-primary">${{ product.price }}</h4>
+                                    <small class="text-muted">Current Price</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h4 class="text-info">{{ product.instock }}</h4>
+                                    <small class="text-muted">Items in Stock</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h4 class="text-warning">{{ product.code }}</h4>
+                                    <small class="text-muted">Product Code</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-success">
+                                    {% if product.instock > 0 %}
+                                        <i class="fas fa-check"></i>
+                                    {% else %}
+                                        <i class="fas fa-times"></i>
+                                    {% endif %}
+                                </h4>
+                                <small class="text-muted">Availability</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
